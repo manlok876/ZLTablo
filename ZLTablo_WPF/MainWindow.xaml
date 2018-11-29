@@ -1,0 +1,158 @@
+﻿<Window x:Class="ZLTablo_WPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ZLTablo_WPF"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:commands="clr-namespace:ZLTablo_WPF"
+        mc:Ignorable="d"
+        Title="Турнирное табло - управляющее окно" Height="780" Width="1024">
+    <Window.CommandBindings>
+        <CommandBinding 
+            Command="{x:Static local:MyAppCommands.MaxShowWindowCmd}" 
+            CanExecute="True_CanExecute" 
+            Executed="MaxShowCommand_Executed" />
+        <CommandBinding 
+            Command="{x:Static local:MyAppCommands.HelpCmd}" 
+            CanExecute="True_CanExecute" 
+            Executed="HelpCommand_Executed" />
+    </Window.CommandBindings>
+    <Window.Resources>
+        <sys:Int32 x:Key="IntZero">0</sys:Int32>
+    </Window.Resources>
+    <Grid Name="BGG" >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="0" />
+        </Grid.RowDefinitions>
+        <DockPanel Grid.Row="0">
+            <Menu DockPanel.Dock="Top">
+                <MenuItem Header="_Меню" Name="MainMenu">
+                    <MenuItem Header="_Заново" Command="{Binding RestartCommand}"/>
+                    <MenuItem Header="Показать второе окно" Command="{Binding SecondWindowCommand}"/>
+                    <MenuItem Header="Развернуть второе окно" Command="{x:Static local:MyAppCommands.MaxShowWindowCmd}"/>
+                    <MenuItem Header="Время">
+                        <MenuItem Header="0:45" Command="{Binding TimeChangeCommand}">
+                            <MenuItem.CommandParameter>
+                                <sys:Int32>45000</sys:Int32>
+                            </MenuItem.CommandParameter>
+                        </MenuItem>
+                        <MenuItem Header="2:00" Command="{Binding TimeChangeCommand}">
+                            <MenuItem.CommandParameter>
+                                <sys:Int32>120000</sys:Int32>
+                            </MenuItem.CommandParameter>
+                        </MenuItem>
+                    </MenuItem>
+                    <MenuItem Header="Выход" Command="{Binding ExitCommand}"/>
+                </MenuItem>
+                <MenuItem Header="_Ристалище">
+                    <MenuItem Header="1" Command="{Binding ArenaChangeCommand}">
+                        <MenuItem.CommandParameter>
+                            <sys:Int32>1</sys:Int32>
+                        </MenuItem.CommandParameter>
+                    </MenuItem>
+                    <MenuItem Header="2" Command="{Binding ArenaChangeCommand}">
+                        <MenuItem.CommandParameter>
+                            <sys:Int32>2</sys:Int32>
+                        </MenuItem.CommandParameter>
+                    </MenuItem>
+                    <MenuItem Header="3" Command="{Binding ArenaChangeCommand}">
+                        <MenuItem.CommandParameter>
+                            <sys:Int32>3</sys:Int32>
+                        </MenuItem.CommandParameter>
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Header="Звук" Name="SoundMenu">
+                    <MenuItem Header="Buzzer" Command="{Binding SoundChangeCommand}">
+                        <MenuItem.CommandParameter>
+                            <sys:String>Sound/timeout1.wav</sys:String>
+                        </MenuItem.CommandParameter>
+                    </MenuItem>
+                    <MenuItem Header="MLG Horn" Command="{Binding SoundChangeCommand}">
+                        <MenuItem.CommandParameter>
+                            <sys:String>Sound/timeout2.wav</sys:String>
+                        </MenuItem.CommandParameter>
+                    </MenuItem>
+                    <MenuItem Header="Гром" Command="{Binding SoundChangeCommand}">
+                        <MenuItem.CommandParameter>
+                            <sys:String>Sound/timeout3.wav</sys:String>
+                        </MenuItem.CommandParameter>
+                    </MenuItem>
+                    <MenuItem Header="Фанфары" Command="{Binding SoundChangeCommand}">
+                        <MenuItem.CommandParameter>
+                            <sys:String>Sound/timeout4.wav</sys:String>
+                        </MenuItem.CommandParameter>
+                    </MenuItem>
+                    <MenuItem Header="Секретная кнопка" Command="{Binding SoundChangeCommand}">
+                        <MenuItem.CommandParameter>
+                            <sys:String>Sound/timeout_secret.wav</sys:String>
+                        </MenuItem.CommandParameter>
+                    </MenuItem>
+                </MenuItem>
+            </Menu>
+            <StackPanel></StackPanel>
+        </DockPanel>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Border Name="Left" Grid.Column="0">
+                <Viewbox Margin="10,20,10,20" >
+                    <TextBlock Name="ScoreLeftTextBlock" 
+                        Text="0"
+                        TextAlignment="Center" Foreground="#FFF10000"
+                        VerticalAlignment="Center">
+                    </TextBlock>
+                </Viewbox>
+            </Border>
+            <Viewbox Grid.Column="2">
+                <DockPanel Grid.Column="2">
+                    <TextBlock DockPanel.Dock="Top"
+                           Margin="10,10,10,20" 
+                           Name="ArenaTextBlock" 
+                           Text="Ристалище 1" FontSize="60" 
+                           TextAlignment="Center"/>
+                    <Image x:Name="Logo"
+                       DockPanel.Dock="Top"
+                       Source="/Images/logo.jpg" Height="478"/>
+                    <TextBlock DockPanel.Dock="Bottom"
+                           Margin="10,10,10,20" 
+                           Name="TimerTextBlock" 
+                           Text="0:00" FontSize="150" 
+                           TextAlignment="Center"/>
+                </DockPanel>
+            </Viewbox>
+            <Border Name="Right" Grid.Column="4">
+                <Viewbox  Margin="10,20,10,20">
+                    <TextBlock Name="ScoreRightTextBlock" 
+                           Text="0"
+                           TextAlignment="Center"
+                           VerticalAlignment="Center" Foreground="#FF0017FF">
+                    </TextBlock>
+                </Viewbox>
+            </Border>
+        </Grid>
+
+        <Grid Grid.Row="2" Background="LightGray">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" Margin="10" Name="LeftControls">
+                
+            </StackPanel>
+        </Grid>
+    </Grid>
+
+</Window>
