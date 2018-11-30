@@ -24,15 +24,14 @@ namespace ZLTablo_WPF
     /// </summary>
     public partial class MainWindow : Window
     {
-        private const int T = 1000;
+        private const int T = 100;
         private int leftScore;
         private int rightScore;
 
-        DispatcherTimer timer;
-        private int minutesLeft;
-        private int secondsLeft;
-        private int mSecondsLeft;
-        private int matchTime;
+        private DispatcherTimer timer;
+        private DateTime lastTick;
+        private TimeSpan timeLeft;
+        private TimeSpan matchTime;
         private bool matchInProgress;
 
         private int arena;
@@ -42,7 +41,7 @@ namespace ZLTablo_WPF
         public ShowWindow showWindow;
         public int LeftScore { get { return leftScore; } }
         public int RightScore { get { return rightScore; } }
-        public int SecondsLeft { get { return mSecondsLeft; } }
+        public TimeSpan TimeLeft { get { return timeLeft; } }
 
         public MainWindow()
         {
@@ -54,16 +53,17 @@ namespace ZLTablo_WPF
             sound.Load();
             leftScore = 0;
             rightScore = 0;
-            mSecondsLeft = 45000;
-            matchTime = 45000;
-            UpdateTimer();
             UpdateScore();
 
             arena = 1;
 
             timer = new DispatcherTimer();
-            timer.Tick += new EventHandler(TimerTick);
-            timer.Interval = new TimeSpan(0, 0, 0, 0, T);
+            timer.Interval = new TimeSpan(T);
+            timer.Tick += TimerTick;
+            matchTime = new TimeSpan(0, 0, 15);
+            timeLeft = matchTime;
+            matchInProgress = true;
+            UpdateTimer();
 
             this.KeyDown += new KeyEventHandler(OnButtonKeyDown);
 
@@ -105,25 +105,25 @@ namespace ZLTablo_WPF
 
         private void TimerTick(object sender, EventArgs e)
         {
-            mSecondsLeft -= T;
-            UpdateTimer();
-            if (mSecondsLeft == 0)
+            DateTime now = DateTime.Now;
+            TimeSpan delta = now - lastTick;
+            lastTick = now;
+            if (timeLeft < delta)
             {
+                timeLeft = TimeSpan.Zero;
                 matchInProgress = false;
                 timer.Stop();
                 sound.Play();
             }
+            else
+            {
+                timeLeft -= delta;
+            }
+            UpdateTimer();
         }
         private void UpdateTimer ()
         {
-            TimerTextBlock.Text = String.Format("{0}:{1}{2}",
-                                                mSecondsLeft / 60000,
-                                                mSecondsLeft % 60000 / 10000,
-                                                mSecondsLeft % 10000 / 1000);
-            //TimerTextBlock.Text = String.Format("{0}:{1}{2}",
-            //                                    minutesLeft, 
-            //                                    secondsLeft / 10,
-            //                                    secondsLeft % 10);
+            TimerTextBlock.Text = String.Format("{0}:{1:00},{2:00}", timeLeft.Minutes, timeLeft.Seconds, timeLeft.Milliseconds / 10);
             if (showWindow != null) showWindow.UpdateTimer();
         }
         private void UpdateScore ()
@@ -156,9 +156,9 @@ namespace ZLTablo_WPF
             {
                 w.leftScore = 0;
                 w.rightScore = 0;
-                w.mSecondsLeft = w.matchTime;
+                w.timeLeft = w.matchTime;
                 w.timer.Stop();
-                w.matchInProgress = false;
+                w.matchInProgress = true;
                 w.UpdateScore();
                 w.UpdateTimer();
             }
@@ -231,7 +231,7 @@ namespace ZLTablo_WPF
             }
             public void Execute(object parameter)
             {
-                w.matchTime = (int)parameter;
+                w.matchTime = new TimeSpan(0, 0, (int) parameter);
                 w._restartCmd.Execute(null);
             }
         }
@@ -358,12 +358,13 @@ namespace ZLTablo_WPF
                     else
                     {
                         timer.Start();
+                        lastTick = DateTime.Now;
                     }
                 }
-                else if (mSecondsLeft > 0)
+                else if (timeLeft > TimeSpan.Zero)
                 {
                     timer.Start();
-                    matchInProgress = true;
+                    lastTick = DateTime.Now;
                 }
             }
             else if (e.Key == Key.Q)
@@ -418,16 +419,14 @@ namespace ZLTablo_WPF
             }
             else if (e.Key == Key.G)
             {
-                if (mSecondsLeft == 0)
-                {
-                    matchInProgress = true;
-                }
-                mSecondsLeft += 1000;
+                timeLeft += new TimeSpan(0, 0, 1);
+                matchInProgress = true;
                 UpdateTimer();
             }
             else if (e.Key == Key.V)
             {
-                mSecondsLeft = 60000;
+                timeLeft += new TimeSpan(0, 1, 0);
+                matchInProgress = true;
                 UpdateTimer();
             }
         }

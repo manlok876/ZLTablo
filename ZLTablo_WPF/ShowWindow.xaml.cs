@@ -26,11 +26,6 @@ namespace ZLTablo_WPF
         
         public void UpdateTimer()
         {
-            int mSecondsLeft = ((MainWindow)Owner).SecondsLeft;
-            //TimerTextBlock.Text = String.Format("{0}:{1}{2}",
-            //                                    mSecondsLeft / 60000,
-            //                                    mSecondsLeft % 60000 / 10000,
-            //                                    mSecondsLeft % 10000 / 1000);
             TimerTextBlock.Text = ((MainWindow)Owner).TimerTextBlock.Text;
         }
         public void UpdateScore()

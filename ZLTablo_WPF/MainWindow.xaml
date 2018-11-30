@@ -36,12 +36,12 @@
                     <MenuItem Header="Время">
                         <MenuItem Header="0:45" Command="{Binding TimeChangeCommand}">
                             <MenuItem.CommandParameter>
-                                <sys:Int32>45000</sys:Int32>
+                                <sys:Int32>45</sys:Int32>
                             </MenuItem.CommandParameter>
                         </MenuItem>
                         <MenuItem Header="2:00" Command="{Binding TimeChangeCommand}">
                             <MenuItem.CommandParameter>
-                                <sys:Int32>120000</sys:Int32>
+                                <sys:Int32>120</sys:Int32>
                             </MenuItem.CommandParameter>
                         </MenuItem>
                     </MenuItem>

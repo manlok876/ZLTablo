@@ -8,17 +8,19 @@ namespace ZLTablo_WPF
 {
     public class Gamemode
     {
-        private TimeSpan totalTime;
-        private bool timeIsDirty;
+        private string _name;
+        private TimeSpan _totalTime;
+        private bool _timeIsDirty;
 
         List<Int16> scores;
 
         private int maxDiff;
         private int maxClash;
 
-        public Gamemode()
+        public Gamemode(String name, Int16 seconds, Boolean timeIsDirty) 
         {
-
+            _name = name;
+            
         }
     }
 }
