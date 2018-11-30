@@ -67,8 +67,8 @@ namespace ZLTablo_WPF
 
             gamemodes = new Dictionary<string, Gamemode>();
             gamemodes.Add("Классика", new Gamemode("Классика", 45, false, 10));
-            gamemodes.Add("Военная сабля", new Gamemode("Военная сабля", 120, true, -1, 3));
-            gamemodes.Add("Длинный меч", new Gamemode("Длинный меч", 180, true, -1, 4));
+            gamemodes.Add("Военная сабля", new Gamemode("Военная сабля", 120, true, 7, 4));
+            gamemodes.Add("Длинный меч", new Gamemode("Длинный меч", 180, true, 10, 4));
 
             _gamemodeChangeCmd.Execute("Классика");
 
@@ -412,6 +412,7 @@ namespace ZLTablo_WPF
             Пробел - пауза
 
             F - добавить 1 секунду
+            G - добавить 1 секунду
             J - добавить 1 минуту
             T - поменять местами цвета
 
