@@ -27,23 +27,26 @@ namespace ZLTablo_WPF
         private const int T = 100;
         private int leftScore;
         private int rightScore;
+        private int doubleHits;
 
         private DispatcherTimer timer;
         private DateTime lastTick;
         private TimeSpan timeLeft;
-        private TimeSpan matchTime;
         private bool matchInProgress;
 
         private int arena;
 
-        SoundPlayer sound;
+        private SoundPlayer sound;
+
+        private Dictionary<string, Gamemode> gamemodes;
+        private Gamemode currentGamemode;
 
         public ShowWindow showWindow;
         public int LeftScore { get { return leftScore; } }
         public int RightScore { get { return rightScore; } }
+        public int DoubleHits { get { return doubleHits; } }
+        public Gamemode Gamemode { get { return currentGamemode; } }
         public TimeSpan TimeLeft { get { return timeLeft; } }
-
-        private Dictionary<string, Gamemode> gamemodes;
 
         public MainWindow()
         {
@@ -63,9 +66,9 @@ namespace ZLTablo_WPF
             timer.Tick += TimerTick;
 
             gamemodes = new Dictionary<string, Gamemode>();
-            gamemodes.Add("Классика", new Gamemode("Классика", 45, false));
-            gamemodes.Add("Военная сабля", new Gamemode("Военная сабля", 120, true));
-            gamemodes.Add("Длинный меч", new Gamemode("Длинный меч", 180, true));
+            gamemodes.Add("Классика", new Gamemode("Классика", 45, false, 10));
+            gamemodes.Add("Военная сабля", new Gamemode("Военная сабля", 120, true, -1, 3));
+            gamemodes.Add("Длинный меч", new Gamemode("Длинный меч", 180, true, -1, 4));
 
             _gamemodeChangeCmd.Execute("Классика");
 
@@ -107,7 +110,6 @@ namespace ZLTablo_WPF
             if (showWindow != null) showWindow.UpdateColor();
         }
 
-
         private void TimerTick(object sender, EventArgs e)
         {
             DateTime now = DateTime.Now;
@@ -128,16 +130,61 @@ namespace ZLTablo_WPF
         }
         private void UpdateTimer ()
         {
-            TimerTextBlock.Text = String.Format("{0}:{1:00},{2:00}", timeLeft.Minutes, timeLeft.Seconds, timeLeft.Milliseconds / 10);
+            TimerTextBlock.Text = String.Format("{0}:{1:00},{2:00}", 
+                                                timeLeft.Minutes, 
+                                                timeLeft.Seconds, 
+                                                timeLeft.Milliseconds / 10);
             if (showWindow != null) showWindow.UpdateTimer();
         }
         private void UpdateScore ()
         {
             ScoreLeftTextBlock.Text = leftScore.ToString();
             ScoreRightTextBlock.Text = rightScore.ToString();
+            if (currentGamemode.CountScoreGap)
+            {
+                if (leftScore >= rightScore + currentGamemode.MaxScoreGap)
+                {
+                    Right.Background = Brushes.Black;
+                }
+                else if (rightScore >= leftScore + currentGamemode.MaxScoreGap)
+                {
+                    Left.Background = Brushes.Black;
+                }
+                else
+                {
+                    Left.Background = Brushes.Transparent;
+                    Right.Background = Brushes.Transparent;
+                }
+            }
+            else
+            {
+                Left.Background = Brushes.Transparent;
+                Right.Background = Brushes.Transparent;
+            }
             if (showWindow != null) showWindow.UpdateScore();
         }
-        
+        private void UpdateDoubleHits()
+        {
+            if (currentGamemode.CountDoubleHits)
+            {
+                DoubleHitsTextBlock.Visibility = Visibility.Visible;
+                DoubleHitsTextBlock.Text = String.Format("Обоюдки: {0}", doubleHits);
+                if (doubleHits >= currentGamemode.MaxDoubleHits)
+                {
+                    DoubleHitsTextBlock.Background = Brushes.Red;
+                }
+                else
+                {
+                    DoubleHitsTextBlock.Background = Brushes.White;
+                }
+            }
+            else
+            {
+                DoubleHitsTextBlock.Visibility = Visibility.Hidden;
+            }
+            if (showWindow != null) showWindow.UpdateDoubleHits();
+        }
+
         #region Commands
 
         RestartCmd _restartCmd;
@@ -159,13 +206,13 @@ namespace ZLTablo_WPF
             }
             public void Execute(object parameter)
             {
-                w.leftScore = 0;
-                w.rightScore = 0;
-                w.timeLeft = w.matchTime;
+                w.leftScore = w.rightScore = w.doubleHits = 0;
+                w.timeLeft = w.currentGamemode.TotalTime;
                 w.timer.Stop();
                 w.matchInProgress = true;
                 w.UpdateScore();
                 w.UpdateTimer();
+                w.UpdateDoubleHits();
             }
         }
 
@@ -205,6 +252,7 @@ namespace ZLTablo_WPF
                 w.showWindow.UpdateColor();
                 w.showWindow.UpdateScore();
                 w.showWindow.UpdateTimer();
+                w.showWindow.UpdateDoubleHits();
             }
         }
 
@@ -236,8 +284,7 @@ namespace ZLTablo_WPF
             }
             public void Execute(object parameter)
             {
-                Gamemode newGamemode = w.gamemodes[(string) parameter];
-                w.matchTime = newGamemode.TotalTime;
+                w.currentGamemode = w.gamemodes[(string) parameter];
                 w._restartCmd.Execute(null);
             }
         }
@@ -351,6 +398,25 @@ namespace ZLTablo_WPF
         #endregion
 
         #region Controls
+        /*
+         *  F1,F2,F3 или Q,W,E - прибавить левому бойцу 1, 2, или 3 балла
+            F4 или Z - снять 1 балл
+            F12,F11,F10 или P,O,I - прибавить правому бойцу 1, 2, или 3 балла
+            F9 или M- снять 1 балл
+
+            F5 - отметить обоюдку
+            F6 - убрать обоюдку
+            F8 - перезапуск матча
+            F7 или Y - последний сход
+
+            Пробел - пауза
+
+            F - добавить 1 секунду
+            J - добавить 1 минуту
+            T - поменять местами цвета
+
+            Все буквы латинские
+         * */
         private void OnButtonKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Space)
@@ -373,22 +439,22 @@ namespace ZLTablo_WPF
                     lastTick = DateTime.Now;
                 }
             }
-            else if (e.Key == Key.Q)
+            else if (e.Key == Key.Q || e.Key == Key.F1)
             {
                 leftScore += 1;
                 UpdateScore();
             }
-            else if (e.Key == Key.W)
+            else if (e.Key == Key.W || e.Key == Key.F2)
             {
                 leftScore += 2;
                 UpdateScore();
             }
-            else if (e.Key == Key.E)
+            else if (e.Key == Key.E || e.Key == Key.F3)
             {
                 leftScore += 3;
                 UpdateScore();
             }
-            else if (e.Key == Key.Z)
+            else if (e.Key == Key.Z || e.Key == Key.F4)
             {
                 if (leftScore > 0)
                 {
@@ -396,22 +462,22 @@ namespace ZLTablo_WPF
                     UpdateScore();
                 }
             }
-            else if (e.Key == Key.I)
+            else if (e.Key == Key.I || e.Key == Key.F10)
             {
                 rightScore += 3;
                 UpdateScore();
             }
-            else if (e.Key == Key.O)
+            else if (e.Key == Key.O || e.Key == Key.F11)
             {
                 rightScore += 2;
                 UpdateScore();
             }
-            else if (e.Key == Key.P)
+            else if (e.Key == Key.P || e.Key == Key.F12)
             {
                 rightScore += 1;
                 UpdateScore();
             }
-            else if (e.Key == Key.M)
+            else if (e.Key == Key.M || e.Key == Key.F9)
             {
                 if (rightScore > 0)
                 {
@@ -429,15 +495,34 @@ namespace ZLTablo_WPF
                 matchInProgress = true;
                 UpdateTimer();
             }
-            else if (e.Key == Key.V)
+            else if (e.Key == Key.H)
             {
                 timeLeft += new TimeSpan(0, 1, 0);
                 matchInProgress = true;
                 UpdateTimer();
             }
-            else if (e.Key == Key.F12)
+            else if (e.Key == Key.F8)
             {
                 _restartCmd.Execute(null);
+            }
+            else if (e.Key == Key.F5)
+            {
+                doubleHits++;
+                UpdateDoubleHits();
+            }
+            else if (e.Key == Key.F6)
+            {
+                if (doubleHits > 0)
+                {
+                    doubleHits--;
+                    UpdateDoubleHits();
+                }
+            }
+            else if (e.Key == Key.Y || e.Key == Key.F7)
+            {
+                timeLeft = new TimeSpan(0, 1, 0);
+                matchInProgress = true;
+                UpdateTimer();
             }
         }
         #endregion

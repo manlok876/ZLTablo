@@ -30,17 +30,42 @@ namespace ZLTablo_WPF
         }
         public void UpdateScore()
         {
-            int leftScore = ((MainWindow)Owner).LeftScore;
-            int rightScore = ((MainWindow)Owner).RightScore;
+            MainWindow mw = ((MainWindow)Owner);
+            int leftScore = mw.LeftScore;
+            int rightScore = mw.RightScore;
             ScoreRightTextBlock.Text = leftScore.ToString();
+            Right.Background = mw.Left.Background;
             ScoreLeftTextBlock.Text = rightScore.ToString();
+            Left.Background = mw.Right.Background;
+        }
+        public void UpdateDoubleHits()
+        {
+            MainWindow mw = ((MainWindow)Owner);
+            if (mw.Gamemode.CountDoubleHits)
+            {
+                DoubleHitsTextBlock.Visibility = Visibility.Visible;
+                DoubleHitsTextBlock.Text = String.Format("Обоюдки: {0}", mw.DoubleHits);
+                if (mw.DoubleHits >= mw.Gamemode.MaxDoubleHits)
+                {
+                    DoubleHitsTextBlock.Background = Brushes.Red;
+                }
+                else
+                {
+                    DoubleHitsTextBlock.Background = Brushes.White;
+                }
+            }
+            else
+            {
+                DoubleHitsTextBlock.Visibility = Visibility.Hidden;
+            }
         }
         public void UpdateColor()
         {
-            Left.Background = ((MainWindow)Owner).Right.Background;
-            ScoreLeftTextBlock.Foreground = ((MainWindow)Owner).ScoreRightTextBlock.Foreground;
-            Right.Background = ((MainWindow)Owner).Left.Background;
-            ScoreRightTextBlock.Foreground = ((MainWindow)Owner).ScoreLeftTextBlock.Foreground;
+            MainWindow mw = ((MainWindow)Owner);
+            Left.Background = mw.Right.Background;
+            ScoreLeftTextBlock.Foreground = mw.ScoreRightTextBlock.Foreground;
+            Right.Background = mw.Left.Background;
+            ScoreRightTextBlock.Foreground = mw.ScoreLeftTextBlock.Foreground;
         }
 
         public void Restart()
