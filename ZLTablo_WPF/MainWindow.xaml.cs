@@ -43,11 +43,31 @@ namespace ZLTablo_WPF
         public int RightScore { get { return rightScore; } }
         public TimeSpan TimeLeft { get { return timeLeft; } }
 
+        private Dictionary<string, Gamemode> gamemodes;
+
         public MainWindow()
         {
             InitializeComponent();
             DataContext = this;
             WindowState = WindowState.Maximized;
+
+            _restartCmd = new RestartCmd(this);
+            _soundChangeCmd = new SoundChangeCmd(this);
+            _gamemodeChangeCmd = new GamemodeChangeCmd(this);
+            _secondWindowCmd = new SecondWindowCmd(this);
+            _arenaChangeCmd = new ArenaChangeCmd(this);
+            _exitCmd = new ExitCmd(this);
+
+            timer = new DispatcherTimer();
+            timer.Interval = new TimeSpan(T);
+            timer.Tick += TimerTick;
+
+            gamemodes = new Dictionary<string, Gamemode>();
+            gamemodes.Add("Классика", new Gamemode("Классика", 45, false));
+            gamemodes.Add("Военная сабля", new Gamemode("Военная сабля", 120, true));
+            gamemodes.Add("Длинный меч", new Gamemode("Длинный меч", 180, true));
+
+            _gamemodeChangeCmd.Execute("Классика");
 
             sound = new SoundPlayer("Sound/timeout2.wav");
             sound.Load();
@@ -57,22 +77,7 @@ namespace ZLTablo_WPF
 
             arena = 1;
 
-            timer = new DispatcherTimer();
-            timer.Interval = new TimeSpan(T);
-            timer.Tick += TimerTick;
-            matchTime = new TimeSpan(0, 0, 15);
-            timeLeft = matchTime;
-            matchInProgress = true;
-            UpdateTimer();
-
             this.KeyDown += new KeyEventHandler(OnButtonKeyDown);
-
-            _restartCmd = new RestartCmd(this);
-            _soundChangeCmd = new SoundChangeCmd(this);
-            _timeChangeCmd = new TimeChangeCmd(this);
-            _secondWindowCmd = new SecondWindowCmd(this);
-            _arenaChangeCmd = new ArenaChangeCmd(this);
-            _exitCmd = new ExitCmd(this);
         }
 
         private void SecondWindow ()
@@ -212,15 +217,15 @@ namespace ZLTablo_WPF
         }
 
 
-        TimeChangeCmd _timeChangeCmd;
-        public TimeChangeCmd TimeChangeCommand
+        GamemodeChangeCmd _gamemodeChangeCmd;
+        public GamemodeChangeCmd GamemodeChangeCommand
         {
-            get { return _timeChangeCmd; }
+            get { return _gamemodeChangeCmd; }
         }
-        public class TimeChangeCmd : ICommand
+        public class GamemodeChangeCmd : ICommand
         {
             MainWindow w;
-            public TimeChangeCmd(MainWindow window)
+            public GamemodeChangeCmd(MainWindow window)
             {
                 w = window;
             }
@@ -231,7 +236,8 @@ namespace ZLTablo_WPF
             }
             public void Execute(object parameter)
             {
-                w.matchTime = new TimeSpan(0, 0, (int) parameter);
+                Gamemode newGamemode = w.gamemodes[(string) parameter];
+                w.matchTime = newGamemode.TotalTime;
                 w._restartCmd.Execute(null);
             }
         }
