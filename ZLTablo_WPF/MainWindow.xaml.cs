@@ -489,13 +489,19 @@ namespace ZLTablo_WPF
             {
                 swapColor();
             }
+            else if (e.Key == Key.F)
+            {
+                timeLeft += new TimeSpan(0, 0, 1);
+                matchInProgress = true;
+                UpdateTimer();
+            }
             else if (e.Key == Key.G)
             {
                 timeLeft += new TimeSpan(0, 0, 1);
                 matchInProgress = true;
                 UpdateTimer();
             }
-            else if (e.Key == Key.H)
+            else if (e.Key == Key.J)
             {
                 timeLeft += new TimeSpan(0, 1, 0);
                 matchInProgress = true;
