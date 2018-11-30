@@ -429,6 +429,10 @@ namespace ZLTablo_WPF
                 matchInProgress = true;
                 UpdateTimer();
             }
+            else if (e.Key == Key.F12)
+            {
+                _restartCmd.Execute(null);
+            }
         }
         #endregion
     }
