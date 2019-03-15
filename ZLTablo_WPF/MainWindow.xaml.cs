@@ -66,11 +66,10 @@ namespace ZLTablo_WPF
             timer.Tick += TimerTick;
 
             gamemodes = new Dictionary<string, Gamemode>();
-            gamemodes.Add("Классика", new Gamemode("Классика", 45, false, 10));
-            gamemodes.Add("Военная сабля", new Gamemode("Военная сабля", 120, true, 7, 4));
-            gamemodes.Add("Длинный меч", new Gamemode("Длинный меч", 180, true, 10, 4));
+            gamemodes.Add("Рапира", new Gamemode("Рапира", 180, true, 15, 3));
+            gamemodes.Add("Меч", new Gamemode("Меч", 180, true, 8, 3));
 
-            _gamemodeChangeCmd.Execute("Классика");
+            _gamemodeChangeCmd.Execute("Рапира");
 
             sound = new SoundPlayer("Sound/timeout2.wav");
             sound.Load();
