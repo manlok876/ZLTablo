@@ -411,8 +411,8 @@ namespace ZLTablo_WPF
 
             Пробел - пауза
 
-            F - добавить 1 секунду
-            G - добавить 1 секунду
+            F - прибавить 1 секунду
+            G - вычесть 1 секунду
             J - добавить 1 минуту
             T - поменять местами цвета
 
@@ -463,7 +463,7 @@ namespace ZLTablo_WPF
                     UpdateScore();
                 }
             }
-            else if (e.Key == Key.I || e.Key == Key.F10)
+            else if (e.Key == Key.I || e.Key == Key.System)
             {
                 rightScore += 3;
                 UpdateScore();
@@ -498,7 +498,7 @@ namespace ZLTablo_WPF
             }
             else if (e.Key == Key.G)
             {
-                timeLeft += new TimeSpan(0, 0, 1);
+                timeLeft -= new TimeSpan(0, 0, 1);
                 matchInProgress = true;
                 UpdateTimer();
             }
