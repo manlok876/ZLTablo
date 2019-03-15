@@ -36,19 +36,14 @@
                     <MenuItem Header="Выход" Command="{Binding ExitCommand}"/>
                 </MenuItem>
                 <MenuItem Header="_Номинация" Name="GamemodeMenu">
-                    <MenuItem Header="Классика" Command="{Binding GamemodeChangeCommand}">
+                    <MenuItem Header="Рапира" Command="{Binding GamemodeChangeCommand}">
                         <MenuItem.CommandParameter>
-                            <sys:String>Классика</sys:String>
+                            <sys:String>Рапира</sys:String>
                         </MenuItem.CommandParameter>
                     </MenuItem>
-                    <MenuItem Header="Военная сабля" Command="{Binding GamemodeChangeCommand}">
+                    <MenuItem Header="Меч" Command="{Binding GamemodeChangeCommand}">
                         <MenuItem.CommandParameter>
-                            <sys:String>Военная сабля</sys:String>
-                        </MenuItem.CommandParameter>
-                    </MenuItem>
-                    <MenuItem Header="Длинный меч" Command="{Binding GamemodeChangeCommand}">
-                        <MenuItem.CommandParameter>
-                            <sys:String>Длинный меч</sys:String>
+                            <sys:String>Меч</sys:String>
                         </MenuItem.CommandParameter>
                     </MenuItem>
 
