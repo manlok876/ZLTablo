@@ -10,6 +10,7 @@ namespace ZLTablo_WPF
     {
         private string _name;
         private TimeSpan _totalTime;
+        private TimeSpan _finalRoundTime;
         private bool _timeIsDirty;
 
         List<Int16> scores;
@@ -19,6 +20,7 @@ namespace ZLTablo_WPF
 
         public String Name { get { return _name; } }
         public TimeSpan TotalTime { get { return _totalTime; } }
+        public TimeSpan FinalRoundTime { get { return _finalRoundTime; } }
         public Boolean TimeIsDirty { get { return _timeIsDirty; } }
 
         public Boolean CountScoreGap { get { return _maxScoreGap >= 0; } }
@@ -27,10 +29,11 @@ namespace ZLTablo_WPF
         public Int32 MaxDoubleHits { get { return _maxDoubleHits; } }
         public Int32 MaxScoreGap { get { return _maxScoreGap; } }
 
-        public Gamemode(String name, Int32 seconds, Boolean timeIsDirty, Int32 maxScoreGap = -1, Int32 maxDoubleHits = -1) 
+        public Gamemode(String name, Int32 seconds, Boolean timeIsDirty, Int32 maxScoreGap = -1, Int32 finalRoundSeconds = 60, Int32 maxDoubleHits = -1) 
         {
             _name = name;
             _totalTime = new TimeSpan(0, 0, seconds);
+            _finalRoundTime = new TimeSpan(0, 0, finalRoundSeconds);
             _timeIsDirty = timeIsDirty;
             _maxScoreGap = maxScoreGap;
             _maxDoubleHits = maxDoubleHits;

@@ -65,12 +65,8 @@ namespace ZLTablo_WPF
             timer.Interval = new TimeSpan(T);
             timer.Tick += TimerTick;
 
-            gamemodes = new Dictionary<string, Gamemode>();
-            gamemodes.Add("Классика", new Gamemode("Классика", 45, false, 10));
-            gamemodes.Add("Военная сабля", new Gamemode("Военная сабля", 120, true, 7, 4));
-            gamemodes.Add("Длинный меч", new Gamemode("Длинный меч", 180, true, 10, 4));
-
-            _gamemodeChangeCmd.Execute("Классика");
+            RegisterGamemodes();
+            SetupGamemodeMenu();
 
             sound = new SoundPlayer("Sound/timeout2.wav");
             sound.Load();
@@ -81,6 +77,38 @@ namespace ZLTablo_WPF
             arena = 1;
 
             this.KeyDown += new KeyEventHandler(OnButtonKeyDown);
+        }
+
+        private void AddGamemode (Gamemode gamemode)
+        {
+            gamemodes.Add(gamemode.Name, gamemode);
+        }
+
+        private void RegisterGamemodes ()
+        {
+            gamemodes = new Dictionary<string, Gamemode>();
+            //gamemodes.Add("Классика", new Gamemode("Классика", 45, false, 10));
+            AddGamemode(new Gamemode("Рапира", 60, false, 10, 30));
+            AddGamemode(new Gamemode("Рапира-Дага", 120, true, 10));
+            AddGamemode(new Gamemode("Cабля/МБ", 120, true, 7));
+            //AddGamemode(new Gamemode("Длинный меч", 180, true, 10));
+        }
+
+        private void SetupGamemodeMenu ()
+        {
+            if (gamemodes.Count < 1)
+            {
+                AddGamemode(new Gamemode("Классика", 45, false, 10));
+            }
+            foreach (var keyValuePair in gamemodes)
+            {
+                MenuItem GamemodeEntry = new MenuItem();
+                GamemodeEntry.Header = keyValuePair.Key;
+                GamemodeEntry.Command = GamemodeChangeCommand;
+                GamemodeEntry.CommandParameter = keyValuePair.Key;
+                this.GamemodeMenu.Items.Add(GamemodeEntry);
+            }
+            _gamemodeChangeCmd.Execute(((MenuItem)this.GamemodeMenu.Items[0]).Header);
         }
 
         private void SecondWindow ()
@@ -134,6 +162,11 @@ namespace ZLTablo_WPF
                                                 timeLeft.Minutes, 
                                                 timeLeft.Seconds, 
                                                 timeLeft.Milliseconds / 10);
+            
+            if (TimeLeft < new TimeSpan(0, 0, 10))
+            {
+                TimerTextBlock.Background = Brushes.OrangeRed;
+            }
             if (showWindow != null) showWindow.UpdateTimer();
         }
         private void UpdateScore ()
@@ -209,6 +242,7 @@ namespace ZLTablo_WPF
                 w.leftScore = w.rightScore = w.doubleHits = 0;
                 w.timeLeft = w.currentGamemode.TotalTime;
                 w.timer.Stop();
+                w.TimerTextBlock.Background = Brushes.Transparent;
                 w.matchInProgress = true;
                 w.UpdateScore();
                 w.UpdateTimer();
@@ -527,7 +561,8 @@ namespace ZLTablo_WPF
             }
             else if (e.Key == Key.Y || e.Key == Key.F7)
             {
-                timeLeft = new TimeSpan(0, 1, 0);
+                timeLeft = currentGamemode.FinalRoundTime;
+                TimerTextBlock.Background = Brushes.LightGreen;
                 matchInProgress = true;
                 UpdateTimer();
             }
