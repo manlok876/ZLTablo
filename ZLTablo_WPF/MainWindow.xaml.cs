@@ -65,10 +65,7 @@ namespace ZLTablo_WPF
             timer.Interval = new TimeSpan(T);
             timer.Tick += TimerTick;
 
-            gamemodes = new Dictionary<string, Gamemode>();
-            gamemodes.Add("Классика", new Gamemode("Классика", 45, false, 10));
-            gamemodes.Add("Военная сабля", new Gamemode("Военная сабля", 120, true, 7, 4));
-            gamemodes.Add("Длинный меч", new Gamemode("Длинный меч", 180, true, 10, 4));
+            RegisterGamemodes();
 
             _gamemodeChangeCmd.Execute("Классика");
 
@@ -81,6 +78,14 @@ namespace ZLTablo_WPF
             arena = 1;
 
             this.KeyDown += new KeyEventHandler(OnButtonKeyDown);
+        }
+
+        private void RegisterGamemodes ()
+        {
+            gamemodes = new Dictionary<string, Gamemode>();
+            gamemodes.Add("Классика", new Gamemode("Классика", 45, false, 10));
+            gamemodes.Add("Военная сабля", new Gamemode("Военная сабля", 120, true, 7));
+            gamemodes.Add("Длинный меч", new Gamemode("Длинный меч", 180, true, 10));
         }
 
         private void SecondWindow ()
