@@ -66,8 +66,7 @@ namespace ZLTablo_WPF
             timer.Tick += TimerTick;
 
             RegisterGamemodes();
-
-            _gamemodeChangeCmd.Execute("Классика");
+            SetupGamemodeMenu();
 
             sound = new SoundPlayer("Sound/timeout2.wav");
             sound.Load();
@@ -86,6 +85,23 @@ namespace ZLTablo_WPF
             gamemodes.Add("Классика", new Gamemode("Классика", 45, false, 10));
             gamemodes.Add("Военная сабля", new Gamemode("Военная сабля", 120, true, 7));
             gamemodes.Add("Длинный меч", new Gamemode("Длинный меч", 180, true, 10));
+        }
+
+        private void SetupGamemodeMenu ()
+        {
+            if (gamemodes.Count < 1)
+            {
+                gamemodes.Add("Классика", new Gamemode("Классика", 45, false, 10));
+            }
+            foreach (var keyValuePair in gamemodes)
+            {
+                MenuItem GamemodeEntry = new MenuItem();
+                GamemodeEntry.Header = keyValuePair.Key;
+                GamemodeEntry.Command = GamemodeChangeCommand;
+                GamemodeEntry.CommandParameter = keyValuePair.Key;
+                this.GamemodeMenu.Items.Add(GamemodeEntry);
+            }
+            _gamemodeChangeCmd.Execute(((MenuItem)this.GamemodeMenu.Items[0]).Header);
         }
 
         private void SecondWindow ()
