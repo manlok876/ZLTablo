@@ -134,6 +134,11 @@ namespace ZLTablo_WPF
                                                 timeLeft.Minutes, 
                                                 timeLeft.Seconds, 
                                                 timeLeft.Milliseconds / 10);
+            
+            if (TimeLeft < new TimeSpan(0, 0, 10))
+            {
+                TimerTextBlock.Background = Brushes.OrangeRed;
+            }
             if (showWindow != null) showWindow.UpdateTimer();
         }
         private void UpdateScore ()
@@ -209,6 +214,7 @@ namespace ZLTablo_WPF
                 w.leftScore = w.rightScore = w.doubleHits = 0;
                 w.timeLeft = w.currentGamemode.TotalTime;
                 w.timer.Stop();
+                w.TimerTextBlock.Background = Brushes.Transparent;
                 w.matchInProgress = true;
                 w.UpdateScore();
                 w.UpdateTimer();
@@ -528,6 +534,7 @@ namespace ZLTablo_WPF
             else if (e.Key == Key.Y || e.Key == Key.F7)
             {
                 timeLeft = new TimeSpan(0, 1, 0);
+                TimerTextBlock.Background = Brushes.LightGreen;
                 matchInProgress = true;
                 UpdateTimer();
             }

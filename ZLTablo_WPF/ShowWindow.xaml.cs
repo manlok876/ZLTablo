@@ -27,6 +27,7 @@ namespace ZLTablo_WPF
         public void UpdateTimer()
         {
             TimerTextBlock.Text = ((MainWindow)Owner).TimerTextBlock.Text;
+            TimerTextBlock.Background = ((MainWindow)Owner).TimerTextBlock.Background;
         }
         public void UpdateScore()
         {
