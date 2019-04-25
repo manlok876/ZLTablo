@@ -79,19 +79,26 @@ namespace ZLTablo_WPF
             this.KeyDown += new KeyEventHandler(OnButtonKeyDown);
         }
 
+        private void AddGamemode (Gamemode gamemode)
+        {
+            gamemodes.Add(gamemode.Name, gamemode);
+        }
+
         private void RegisterGamemodes ()
         {
             gamemodes = new Dictionary<string, Gamemode>();
-            gamemodes.Add("Классика", new Gamemode("Классика", 45, false, 10));
-            gamemodes.Add("Военная сабля", new Gamemode("Военная сабля", 120, true, 7));
-            gamemodes.Add("Длинный меч", new Gamemode("Длинный меч", 180, true, 10));
+            //gamemodes.Add("Классика", new Gamemode("Классика", 45, false, 10));
+            AddGamemode(new Gamemode("Рапира", 60, false, 10, 30));
+            AddGamemode(new Gamemode("Рапира-Дага", 120, true, 10));
+            AddGamemode(new Gamemode("Cабля/МБ", 120, true, 7));
+            //AddGamemode(new Gamemode("Длинный меч", 180, true, 10));
         }
 
         private void SetupGamemodeMenu ()
         {
             if (gamemodes.Count < 1)
             {
-                gamemodes.Add("Классика", new Gamemode("Классика", 45, false, 10));
+                AddGamemode(new Gamemode("Классика", 45, false, 10));
             }
             foreach (var keyValuePair in gamemodes)
             {
@@ -554,7 +561,7 @@ namespace ZLTablo_WPF
             }
             else if (e.Key == Key.Y || e.Key == Key.F7)
             {
-                timeLeft = new TimeSpan(0, 1, 0);
+                timeLeft = currentGamemode.FinalRoundTime;
                 TimerTextBlock.Background = Brushes.LightGreen;
                 matchInProgress = true;
                 UpdateTimer();
